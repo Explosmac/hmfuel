@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl         = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
+}
+
+model user {
+  id    String @id
+  name  String
+  email String @unique
+  cars  car[]
+}
+
+model car {
+  id       Int      @id @default(autoincrement())
+  name     String
+  owner    user     @relation(fields: [owner_id], references: [id])
+  owner_id String
+  refuel   refuel[]
+}
+
+model refuel {
+  id          Int      @id @default(autoincrement())
+  car         car      @relation(fields: [car_id], references: [id])
+  car_id      Int
+  fuel        fuel?
+  payment     payment?
+  full        Boolean?
+  liter_price Float
+  liters      Float
+  total_price Float
+  created_at  DateTime @default(now())
+}
+
+enum fuel {
+  Alcool
+  Gasolina
+  Diesel
+  Outro
+}
+
+enum payment {
+  Credito
+  Debito
+  Dinheiro
+  Pix
+  Outro
+}

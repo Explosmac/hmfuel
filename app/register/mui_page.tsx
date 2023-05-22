@@ -14,6 +14,31 @@ import NextLink from "next/link"
 const RegisterMuiPage = () => {
   const { push } = useRouter()
   const [form, setForm] = useState({ name: "", email: "", password: "" })
+  const [loading, setLoading] = useState(false)
+  const signUp = async () => {
+    setLoading(true)
+    try {
+      if (!form?.name || !form?.email || !form?.password) {
+        throw new Error("Preencha todos os campos")
+      }
+      const { user } = await createUserWithEmailAndPassword(auth, form?.email, form?.password)
+      await axios.post("api/user", {
+        name: form?.name,
+        email: user?.email,
+        id: user?.uid
+      })
+      await signIn("credentials", {
+        redirect: false,
+        email: user?.email,
+        password: form?.password
+      })
+      push("/")
+    } catch (e: any) {
+      alert(e?.message)
+    } finally {
+      setLoading(false)
+    }
+  }
   return (
     <MainContainer maxWidth="xs" sx={{ justifyContent: "space-evenly" }}>
       <Stack spacing={1}>
@@ -24,13 +49,16 @@ const RegisterMuiPage = () => {
         />
         <TextField
           label="Email"
+          type="email"
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
         />
         <TextField
           label="Senha"
+          type="password"
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
+          onKeyDown={(e) => e.key == "Enter" && signUp()}
         />
         <Typography>
           Já possui uma conta?{" "}
@@ -39,29 +67,7 @@ const RegisterMuiPage = () => {
           </Link>{" "}
           e entre
         </Typography>
-        <LoadingButton
-          onClick={async () => {
-            try {
-              const { user } = await createUserWithEmailAndPassword(
-                auth,
-                form?.email,
-                form?.password
-              )
-              await axios.post("api/user", {
-                name: form?.name,
-                email: user?.email,
-                id: user?.uid
-              })
-              await signIn("credentials", {
-                redirect: false,
-                email: user?.email,
-                password: form?.password
-              })
-              push("/")
-            } catch (e) {
-              console.log(e)
-            }
-          }}>
+        <LoadingButton onClick={signUp} loading={loading}>
           Cadastrar
         </LoadingButton>
       </Stack>

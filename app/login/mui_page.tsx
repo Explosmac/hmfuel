@@ -37,12 +37,14 @@ const LoginMuiPage = () => {
           type="email"
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
+          onKeyDown={(e) => e.key == "Enter" && !loading && loginAuth()}
         />
         <TextField
           label="Senha"
           type="password"
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
+          onKeyDown={(e) => e.key == "Enter" && !loading && loginAuth()}
         />
         <Typography>
           Não possui uma conta?{" "}

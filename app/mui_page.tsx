@@ -44,6 +44,7 @@ const MuiPage = ({ cars }: HomeProps) => {
   const { push } = useRouter()
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState<Partial<refuel & { car: car }>>({})
+  const expectedLiters = form.liter_price && form.total_price && form.total_price / form.liter_price
   const expected = form.liter_price && form.liters && form.liter_price * form.liters
   const formatedExpected = expected?.toLocaleString("pt-BR", {
     minimumFractionDigits: 2,
@@ -56,6 +57,7 @@ const MuiPage = ({ cars }: HomeProps) => {
       const { data: abastecimento } = await axios.post("api/refuel", form)
       Boolean(abastecimento?.id) && setForm({})
     } finally {
+      alert("Abastecimento realizado com sucesso!")
       setLoading(false)
     }
   }
@@ -228,16 +230,30 @@ const MuiPage = ({ cars }: HomeProps) => {
                 InputProps={{
                   inputComponent: NumericFormatInput as any
                 }}
+                onKeyDown={(e) =>
+                  ["Enter", "Tab"].includes(e.key) && !loading && sendAbastecimento()
+                }
               />
             </Grid>
           </Grid>
         </Box>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography sx={{ visibility: expected ? "visible" : "hidden" }}>
-            Preço esperado:{" "}
-            <Link onClick={() => setForm({ ...form, total_price: expected })}>
-              {formatedExpected}
-            </Link>
+          <Typography sx={{ visibility: expected || expectedLiters ? "visible" : "hidden" }}>
+            {expectedLiters ? (
+              <>
+                Litros esperados:{" "}
+                <Link onClick={() => setForm({ ...form, liters: expectedLiters })}>
+                  {expectedLiters?.toFixed(3)}
+                </Link>
+              </>
+            ) : (
+              <>
+                Preço esperado:{" "}
+                <Link onClick={() => setForm({ ...form, total_price: expected })}>
+                  {formatedExpected}
+                </Link>
+              </>
+            )}
           </Typography>
           <LoadingButton
             variant="outlined"

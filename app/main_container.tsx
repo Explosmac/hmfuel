@@ -4,7 +4,7 @@ import { Box, ContainerProps, Container, CssBaseline } from "@mui/material"
 
 const MainContainer = ({ children, sx, ...props }: ContainerProps) => {
   return (
-    <Box minHeight="100vh" display="flex" flexDirection="column">
+    <Box minHeight="90vh" display="flex" flexDirection="column">
       <CssBaseline />
       <Container sx={{ flex: 1, display: "flex", flexDirection: "column", ...sx }} {...props}>
         {children}

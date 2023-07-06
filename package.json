@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
+    "db_pull": "dotenv -e .env.development.local -- prisma db pull",
+    "db_push": "dotenv -e .env.development.local -- prisma db push",
     "start": "next start",
     "lint": "next lint"
   },
